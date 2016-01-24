@@ -7,6 +7,7 @@ Next work items, link in the EtcClient library and start building the new client
 
 Both the frontend and backend take two sets of IP:port details. The frontend listens for HTTP connections and connects to the backend. The backend listens for Thrift connections and connects to Etcd.
 
+```
 $ ./webService -h
 Usage of ./webService:
   -bi string
@@ -23,9 +24,10 @@ Usage of ./webService:
     	Listening port (default 8080)
   -root string
     	web service root (default "service")
-    	
-    	
-  $ ./backEndProcessor -h
+```
+
+```
+$ ./backEndProcessor -h
 Usage of ./backEndProcessor:
   -bi string
     	Etcd Service addr (default "127.0.0.1")
@@ -39,5 +41,5 @@ Usage of ./backEndProcessor:
     	Logging destination file, '-' for STDOUT (default "-")
   -lp int
     	Thrift Listening port (default 8081)
-  
+```  
   
