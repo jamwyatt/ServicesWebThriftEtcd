@@ -20,37 +20,85 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 import (
-	"../common"
+	"encoding/json"
+	"github.com/jamwyatt/ServicesWebThriftEtcd/Thrift/gen-go/messages"
+	"github.com/jamwyatt/ServicesWebThriftEtcd/common"
+	"io"
 	"net/http"
 )
 
 // The string base of the URI for which this service is registered
 var root string
+var addr string
+var port int
 
 // Set the root path ... optional
-func SetRoot(r string) {
+func InitService(r string, a string, p int) {
 	root = r
+	addr = a
+	port = p
 }
 
 // customer GET processing
-func CustomerGET(w http.ResponseWriter, r *http.Request) {
+func CustomerGET(c *common.ThriftConnection, w http.ResponseWriter, r *http.Request) {
 	common.Logger.Printf("GET: %s", r.URL)
+	var customer *messages.Customer = messages.NewCustomer()
+	bytes, err := json.Marshal(customer)
+	if err != nil {
+		common.Logger.Printf("Failed to convert to JSON: %s", customer)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(bytes)
 }
 
 // Customer POST processing
-func CustomerPOST(w http.ResponseWriter, r *http.Request) {
+func CustomerPOST(c *common.ThriftConnection, w http.ResponseWriter, r *http.Request) {
 	common.Logger.Printf("POST: %s", r.URL)
+	if r.ContentLength <= 0 {
+		common.Logger.Printf("Failed to detect body content in POST")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	var body = make([]byte, r.ContentLength)
+	n, err := r.Body.Read(body)
+	if err != nil && err != io.EOF {
+		common.Logger.Printf("Failed to read body: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	common.Logger.Printf("Body[%d]: %s", n, body)
+	var thriftCust *messages.Customer = messages.NewCustomer()
+	err = json.Unmarshal(body, &thriftCust)
+	common.Logger.Printf("Customer: %s", thriftCust)
+	result, err := c.Conn().CreateCustomer(thriftCust)
+	if err != nil {
+		common.Logger.Printf("Failed to create new customer: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	common.Logger.Printf("Customer Created: %s", result)
+
 }
 
 // Handle registered hierarchy for HTTP methods (stored with 'SetRoot')
 func Customer(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		CustomerGET(w, r)
-	case "POST":
-		CustomerPOST(w, r)
-	default:
-		w.WriteHeader(http.StatusBadRequest)
-		common.Logger.Printf("Unsupported method: %s %s", r.Method, r.URL)
+
+	c, err := common.NewThriftConnection(addr, port)
+	if err == nil {
+		defer c.Close()
+		switch r.Method {
+		case "GET":
+			CustomerGET(c, w, r)
+		case "POST":
+			CustomerPOST(c, w, r)
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			common.Logger.Printf("Unsupported method: %s %s", r.Method, r.URL)
+		}
+	} else {
+		common.Logger.Printf("Unable to make Thrift connection")
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }

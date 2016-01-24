@@ -20,10 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 import (
-	"../common"
-	"../services"
 	"flag"
 	"fmt"
+	"github.com/jamwyatt/ServicesWebThriftEtcd/common"
+	"github.com/jamwyatt/ServicesWebThriftEtcd/services"
 	"log"
 	"net/http"
 	"time"
@@ -32,24 +32,24 @@ import (
 var logger *log.Logger
 
 type service struct {
-	url string
-	f   func(http.ResponseWriter, *http.Request)
-	sr  func(string)
+	url  string
+	f    func(http.ResponseWriter, *http.Request)
+	init func(root string, beAddr string, bePort int) // Service init with services root and Thrift server details
 }
 
 // List of web end point services
 var myServices []service = []service{
-	{"customer", services.Customer, services.SetRoot}, // customer.go
+	{"customer", services.Customer, services.InitService}, // customer.go
 }
 
-func initWebServices(root string) {
+func initWebServices(root string, addr string, port int) {
 	logger.Printf("Web Service root: %s\n", root)
 	for _, v := range myServices {
 		var path string = fmt.Sprintf("/%s/%s/", root, v.url)
 		logger.Printf("Registering: %s", path)
 		http.HandleFunc(path, v.f)
-		if v.sr != nil {
-			v.sr(path)
+		if v.init != nil {
+			v.init(path, addr, port)
 		}
 	}
 }
@@ -77,7 +77,7 @@ func main() {
 	logger.Printf("Listening: %s:%d\t\tBackend Service: %s:%d\n", *listenIp, *listenPort, *backendIp, *backendPort)
 
 	// Start the webservice
-	initWebServices(*serviceRoot)
+	initWebServices(*serviceRoot, *backendIp, *backendPort)
 	s := &http.Server{
 		Addr:           fmt.Sprintf("%s:%d", *listenIp, *listenPort),
 		ReadTimeout:    10 * time.Second,
