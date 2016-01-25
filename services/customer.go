@@ -42,10 +42,15 @@ func InitService(r string, a string, p int) {
 // customer GET processing
 func CustomerGET(c *common.ThriftConnection, w http.ResponseWriter, r *http.Request) {
 	common.Logger.Printf("GET: %s", r.URL)
-	var customer *messages.Customer = messages.NewCustomer()
-	bytes, err := json.Marshal(customer)
+	result, err := c.Conn().GetCustomer(r.URL.String()[len(root):])
 	if err != nil {
-		common.Logger.Printf("Failed to convert to JSON: %s", customer)
+		common.Logger.Printf("Failed to create new customer: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	bytes, err := json.Marshal(result)
+	if err != nil {
+		common.Logger.Printf("Failed to convert to JSON: %s", result)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -79,7 +84,13 @@ func CustomerPOST(c *common.ThriftConnection, w http.ResponseWriter, r *http.Req
 	}
 
 	common.Logger.Printf("Customer Created: %s", result)
-
+	bytes, err := json.Marshal(result)
+	if err != nil {
+		common.Logger.Printf("Failed to convert result to JSON: %s", result)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(bytes)
 }
 
 // Handle registered hierarchy for HTTP methods (stored with 'SetRoot')
