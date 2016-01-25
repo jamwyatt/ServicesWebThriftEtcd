@@ -1,7 +1,7 @@
 # ServicesWebThriftEtcd
 Basic demo of a web service Frontend with Thrift messaging to a Backend that uses Etcd for simple storage. This only uses HTTP as there is an expectation of SSL termination by a load balancer. This project is being written in golang with a specific purpose of being deployable in kubernetes.
 
-Now has initial support for the basic 'POST' verb to the REST collection of /service/customer/. This takes HTTP POST with JSON body and converts it to a Thrift client request. The backend currently only records the receipt and returns.
+Now has initial support for the basic 'POST' verb to the REST collection of /service/customer/. This takes HTTP POST with JSON body and converts it to a Thrift client request. The backend currently only records the receipt and returns. POST/GET for the customer collection now working.
 
 Next work items, link in the EtcClient library and start building the new client on POST/Create. Then start supporting end-to-end query.
 
