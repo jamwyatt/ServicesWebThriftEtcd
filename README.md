@@ -43,17 +43,20 @@ Usage of ./backEndProcessor:
     	Thrift Listening port (default 8081)
 ```  
   
-  Notes on dependancies:
+#Notes on dependancies:
   
-  Thrift go libraries
+Thrift go libraries
+```
   go get git.apache.org/thrift.git/lib/go/thrift/...
-  
-  UUID code from google
+```
+UUID code from google
+```
   go get github.com/pborman/uuid
-  
-  Etcd library
+```
+Etcd library
+```
   go get github.com/jamwyatt/etcdClientAPI
-  
+```
   
   
   
