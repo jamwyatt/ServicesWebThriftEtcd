@@ -25,14 +25,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 import (
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/pborman/uuid"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"git.apache.org/thrift.git/lib/go/thrift"
-	"github.com/jamwyatt/ServicesWebThriftEtcd/Thrift/gen-go/messages"
-	"github.com/jamwyatt/ServicesWebThriftEtcd/common"
+	"../Thrift/gen-go/messages"
+	"../common"
 	"github.com/jamwyatt/etcdClientAPI/etcdMisc"
 	"log"
 	"net/http"
@@ -92,29 +92,29 @@ func (p *DataStoreHandler) GetCustomer(key string) (r *messages.Customer, err er
 	return &customer, nil
 }
 
-func (p *DataStoreHandler) CreateCustomer(customer *messages.Customer) (r *messages.Result_, err error) {
+func (p *DataStoreHandler) CreateCustomer(customer *messages.Customer) (r *messages.Result, err error) {
 	uuid := uuid.NewUUID()
 	logger.Printf("CreateCustomer: %s -> %s", uuid, customer)
 	p.makeConnection() // Caching open
 	path := customerRoot + uuid.String() + "/" + "details"
 	bytes, err := json.Marshal(customer)
 	if err != nil {
-		return &messages.Result_{false, uuid.String(), "Failed to Create customer"}, errors.New("Failures during customer creation")
+		return &messages.Result{false, uuid.String(), "Failed to Create customer"}, errors.New("Failures during customer creation")
 	}
 	_, err = p.connection.SetValue(path, string(bytes))
 	if err != nil {
 		logger.Printf("Failed to store in etcd[%s]: %s", path, err)
-		return &messages.Result_{false, uuid.String(), "Failed to Create customer"}, errors.New("Failures during customer creation")
+		return &messages.Result{false, uuid.String(), "Failed to Create customer"}, errors.New("Failures during customer creation")
 	}
 
-	return &messages.Result_{true, uuid.String(), ""}, nil
+	return &messages.Result{true, uuid.String(), ""}, nil
 }
 
 func (p *DataStoreHandler) GetAllCustomers(template *messages.Customer) (r map[string]*messages.Customer, err error) {
 	return nil, nil
 }
 
-func (p *DataStoreHandler) UpdateCustomer(key string, customer *messages.Customer) (r *messages.Result_, err error) {
+func (p *DataStoreHandler) UpdateCustomer(key string, customer *messages.Customer) (r *messages.Result, err error) {
 	logger.Printf("UpdateCustomer: %s", customer)
 	return nil, nil
 }

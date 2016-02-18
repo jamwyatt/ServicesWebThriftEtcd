@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import (
 	"flag"
 	"fmt"
-	"github.com/jamwyatt/ServicesWebThriftEtcd/common"
-	"github.com/jamwyatt/ServicesWebThriftEtcd/services"
+	"../common"
+	"../services"
 	"log"
 	"net/http"
 	"time"

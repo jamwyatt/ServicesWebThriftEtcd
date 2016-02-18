@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import (
 	"encoding/json"
-	"github.com/jamwyatt/ServicesWebThriftEtcd/Thrift/gen-go/messages"
-	"github.com/jamwyatt/ServicesWebThriftEtcd/common"
+	"../Thrift/gen-go/messages"
+	"../common"
 	"io"
 	"net/http"
 )

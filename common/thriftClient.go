@@ -5,7 +5,7 @@ package common
 import (
 	"fmt"
 	"git.apache.org/thrift.git/lib/go/thrift"
-	"github.com/jamwyatt/ServicesWebThriftEtcd/Thrift/gen-go/messages"
+	"../Thrift/gen-go/messages"
 	"time"
 )
 
