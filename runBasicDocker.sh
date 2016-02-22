@@ -5,8 +5,8 @@ ETCDNAME=jamwyatt_etcd
 BACKENDNAME=jamwyatt_backend
 FRONTENDNAME=jamwyatt_frontend
 
-docker stop $ETCDNAME $BACKENDNAME $FRONTENDNAME 2>&1 >/dev/null
-docker rm $ETCDNAME  $BACKENDNAME $FRONTENDNAME 2>&1 >/dev/null
+docker stop $ETCDNAME $BACKENDNAME $FRONTENDNAME >/dev/null 2>&1
+docker rm $ETCDNAME  $BACKENDNAME $FRONTENDNAME >/dev/null 2>&1
 
 if [ $# -eq 1 -a "X$1" = "Xstop" ]
 then
@@ -15,7 +15,8 @@ then
 fi
 
 # Etcd ... /data mapped to /tmp/etcd, exposes 4001 and 7001 (TCP)
-rm -rf /tmp/etcd
+echo "Removing the old etcd data ... you might be asked for your root password as etcd builds these out as root"
+sudo rm -rf /tmp/etcd
 docker run -d --name=$ETCDNAME -v /tmp/etcd:/data  microbox/etcd --name defaultEtcdName --data-dir /data
 etcdIP=`docker inspect --format='{{.NetworkSettings.IPAddress}}' $ETCDNAME`
 echo "etcd listening on $etcdIP:4001"
