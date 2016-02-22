@@ -54,6 +54,8 @@ func CustomerGET(c *common.ThriftConnection, w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	header := w.Header()
+	header.Add("Content-Type","application/json")
 	w.Write(bytes)
 }
 
@@ -90,6 +92,7 @@ func CustomerPOST(c *common.ThriftConnection, w http.ResponseWriter, r *http.Req
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	header.Add("Content-Type","application/json")
 	w.Write(bytes)
 }
 
