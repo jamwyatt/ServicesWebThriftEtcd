@@ -15,9 +15,10 @@ then
 fi
 
 # Etcd ... /data mapped to /tmp/etcd, exposes 4001 and 7001 (TCP)
-echo "Removing the old etcd data ... you might be asked for your root password as etcd builds these out as root"
-sudo rm -rf /tmp/etcd
-docker run -d --name=$ETCDNAME -v /tmp/etcd:/data  microbox/etcd --name defaultEtcdName --data-dir /data
+# echo "Removing the old etcd data ... you might be asked for your root password as etcd builds these out as root"
+# sudo rm -rf /tmp/etcd
+# docker run -d --name=$ETCDNAME -v /tmp/etcd:/data  microbox/etcd --name defaultEtcdName --data-dir /data
+docker run -d --name=$ETCDNAME microbox/etcd --name defaultEtcdName
 etcdIP=`docker inspect --format='{{.NetworkSettings.IPAddress}}' $ETCDNAME`
 echo "etcd listening on $etcdIP:4001"
 
